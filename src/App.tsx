@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { motion } from 'motion/react';
 import MedicineReminder from './components/MedicineReminder';
 import Entertainment from './components/Entertainment';
 import AIChats from './components/AIChats';
@@ -16,6 +17,24 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
+      {/* Moving Marquee */}
+      <div className="bg-white border-b border-gray-100 py-2 overflow-hidden sticky top-0 z-[70] shadow-sm">
+        <motion.div 
+          initial={{ x: "100%" }}
+          animate={{ x: "-100%" }}
+          transition={{ 
+            repeat: Infinity, 
+            duration: 20, 
+            ease: "linear" 
+          }}
+          className="whitespace-nowrap inline-block"
+        >
+          <span className="text-xs font-black uppercase tracking-widest text-indigo-500 mx-4">
+            App is developed by AICIRCLE! • Smart Healthcare Solutions • Innovation in Care • App is developed by AICIRCLE!
+          </span>
+        </motion.div>
+      </div>
+
       <BackgroundMusic />
       
       {/* Bottom Navigation for easy access on tablet */}

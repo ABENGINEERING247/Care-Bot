@@ -28,7 +28,33 @@ export default function MedicineReminder() {
   
   // Form State
   const [name, setName] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [time, setTime] = useState('');
+
+  const POPULAR_MEDS = [
+    { name: 'Panadol (Paracetamol)', type: 'Tablet' },
+    { name: 'Brufen (Ibuprofen)', type: 'Tablet' },
+    { name: 'Amoxil', type: 'Tablet' },
+    { name: 'Flagyl', type: 'Tablet' },
+    { name: 'Ponstan', type: 'Tablet' },
+    { name: 'Disprin (Aspirin)', type: 'Tablet' },
+    { name: 'Arinac', type: 'Tablet' },
+    { name: 'Surbex Z', type: 'Tablet' },
+    { name: 'Multi-vitamin', type: 'Tablet' },
+    { name: 'Calcium', type: 'Tablet' },
+    { name: 'Fish Oil', type: 'Tablet' },
+    { name: 'Omeprazole', type: 'Tablet' },
+    { name: 'Metformin', type: 'Tablet' },
+    { name: 'Lisinopril', type: 'Tablet' },
+    { name: 'Atorvastatin', type: 'Tablet' },
+    { name: 'Hydryllin', type: 'Syrup' },
+    { name: 'Panadol Syrup', type: 'Syrup' },
+    { name: 'Brufen Syrup', type: 'Syrup' },
+    { name: 'Benadryl', type: 'Syrup' },
+    { name: 'Ventolin', type: 'Syrup' },
+    { name: 'Acefyl', type: 'Syrup' },
+    { name: 'Robitussin', type: 'Syrup' }
+  ];
   const [dosage, setDosage] = useState('');
   const [voice, setVoice] = useState(true);
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
@@ -366,16 +392,52 @@ export default function MedicineReminder() {
               </div>
 
               <div className="space-y-6">
-                <div className="space-y-2">
+                <div className="space-y-2 relative">
                   <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Medicine Name</label>
                   <input 
                     autoFocus
                     type="text" 
                     placeholder="e.g. Paracetamol"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
                     className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
                   />
+                  {showSuggestions && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-[24px] shadow-2xl z-[60] py-2 max-h-60 overflow-y-auto"
+                    >
+                      <div className="px-4 py-2 border-b border-gray-50 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <span>Popular Suggestions</span>
+                        <button onClick={() => setShowSuggestions(false)} className="hover:text-gray-600">Close</button>
+                      </div>
+                      {POPULAR_MEDS.filter(m => m.name.toLowerCase().includes(name.toLowerCase())).map((med, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            setName(med.name);
+                            setShowSuggestions(false);
+                          }}
+                          className="w-full px-5 py-3 hover:bg-gray-50 text-left flex items-center justify-between transition-colors"
+                        >
+                          <span className="font-bold text-gray-700">{med.name}</span>
+                          <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${med.type === 'Tablet' ? 'bg-indigo-50 text-indigo-500' : 'bg-rose-50 text-rose-500'}`}>
+                            {med.type}
+                          </span>
+                        </button>
+                      ))}
+                      {name && POPULAR_MEDS.filter(m => m.name.toLowerCase().includes(name.toLowerCase())).length === 0 && (
+                        <div className="px-5 py-3 text-sm text-gray-400 italic">
+                          " {name} "
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
