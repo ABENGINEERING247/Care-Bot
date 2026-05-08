@@ -1,0 +1,10 @@
+{
+  "name": "CareBot Medicine Assistant",
+  "description": "Smart medicine reminder system with voice-assisted alarms for the elderly.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "Medicine Scheduling",
+    "Voice Alarms",
+    "Elderly Care Interface"
+  ]
+}
