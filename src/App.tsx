@@ -7,11 +7,12 @@ import { useState } from 'react';
 import MedicineReminder from './components/MedicineReminder';
 import Entertainment from './components/Entertainment';
 import AIChats from './components/AIChats';
+import BluetoothController from './components/BluetoothController';
 import BackgroundMusic from './components/BackgroundMusic';
-import { Pill, Gamepad2, MessageCircle } from 'lucide-react';
+import { Pill, Gamepad2, MessageCircle, Zap } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'meds' | 'play' | 'chat'>('meds');
+  const [activeTab, setActiveTab] = useState<'meds' | 'play' | 'chat' | 'remote'>('meds');
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
@@ -34,6 +35,13 @@ export default function App() {
           <span className="text-[10px] font-bold uppercase tracking-widest">AI Chats</span>
         </button>
         <button 
+          onClick={() => setActiveTab('remote')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'remote' ? 'text-blue-500 scale-110' : 'text-gray-400 opacity-60'}`}
+        >
+          <Zap size={24} />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Remote</span>
+        </button>
+        <button 
           onClick={() => setActiveTab('play')}
           className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'play' ? 'text-[#3282B8] scale-110' : 'text-gray-400 opacity-60'}`}
         >
@@ -45,7 +53,13 @@ export default function App() {
       <main className="flex-1 pb-24">
         {activeTab === 'meds' ? <MedicineReminder /> : 
          activeTab === 'chat' ? <AIChats /> :
+         activeTab === 'remote' ? <BluetoothController /> :
          <Entertainment />}
+        
+        <footer className="mt-12 mb-8 text-center border-t border-gray-100 pt-8 opacity-60">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400">Designed by AICIRCLE</p>
+          <p className="text-xs font-bold text-gray-500 mt-1">Founder: Engr. Bilal Mehmood</p>
+        </footer>
       </main>
     </div>
   );

@@ -32,6 +32,8 @@ export default function MedicineReminder() {
   const [dosage, setDosage] = useState('');
   const [voice, setVoice] = useState(true);
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
+  const [inventoryCount, setInventoryCount] = useState<string>('');
+  const [inventoryThreshold, setInventoryThreshold] = useState<string>('5');
 
   const DAYS = [
     { label: 'S', value: 0, full: 'Sunday' },
@@ -115,7 +117,9 @@ export default function MedicineReminder() {
         time,
         dosage: dosage || '1 dose',
         voiceEnabled: voice,
-        days: selectedDays
+        days: selectedDays,
+        inventoryCount: inventoryCount !== '' ? parseInt(inventoryCount) : undefined,
+        inventoryWarningThreshold: inventoryThreshold !== '' ? parseInt(inventoryThreshold) : 5
       } : m).sort((a, b) => a.time.localeCompare(b.time)));
     } else {
       const newMed: Medicine = {
@@ -126,7 +130,9 @@ export default function MedicineReminder() {
         instructions: '',
         voiceEnabled: voice,
         taken: false,
-        days: selectedDays
+        days: selectedDays,
+        inventoryCount: inventoryCount !== '' ? parseInt(inventoryCount) : undefined,
+        inventoryWarningThreshold: inventoryThreshold !== '' ? parseInt(inventoryThreshold) : 5
       };
       setMeds([...meds, newMed].sort((a, b) => a.time.localeCompare(b.time)));
     }
@@ -143,6 +149,8 @@ export default function MedicineReminder() {
     setDosage(med.dosage);
     setVoice(med.voiceEnabled);
     setSelectedDays(med.days);
+    setInventoryCount(med.inventoryCount?.toString() || '');
+    setInventoryThreshold(med.inventoryWarningThreshold?.toString() || '5');
     setIsAdding(true);
   };
 
@@ -176,6 +184,8 @@ export default function MedicineReminder() {
     setDosage('');
     setVoice(true);
     setSelectedDays([0, 1, 2, 3, 4, 5, 6]);
+    setInventoryCount('');
+    setInventoryThreshold('5');
     setEditingId(null);
   };
 
@@ -185,7 +195,11 @@ export default function MedicineReminder() {
   };
 
   const acknowledgeMed = (id: string) => {
-    setMeds(meds.map(m => m.id === id ? { ...m, taken: true } : m));
+    setMeds(meds.map(m => m.id === id ? { 
+      ...m, 
+      taken: true,
+      inventoryCount: m.inventoryCount !== undefined ? Math.max(0, m.inventoryCount - 1) : undefined
+    } : m));
     setSnoozedMeds(prev => {
       const next = { ...prev };
       delete next[id];
@@ -211,7 +225,11 @@ export default function MedicineReminder() {
       const isDue = (m.days.includes(currentDay) && m.time === currentTime && !m.taken);
       const isSnoozed = snoozedMeds[m.id] && now.getTime() >= snoozedMeds[m.id];
       if (isDue || isSnoozed) {
-        return { ...m, taken: true };
+        return { 
+          ...m, 
+          taken: true,
+          inventoryCount: m.inventoryCount !== undefined ? Math.max(0, m.inventoryCount - 1) : undefined
+        };
       }
       return m;
     }));
@@ -272,7 +290,25 @@ export default function MedicineReminder() {
                 </div>
                 <div className="flex flex-col gap-1">
                   <p className="text-sm text-gray-500">{med.time} • {med.dosage}</p>
-                  <div className="flex gap-1">
+                  
+                  {med.inventoryCount !== undefined && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        med.inventoryCount <= (med.inventoryWarningThreshold || 5)
+                        ? 'bg-rose-100 text-rose-600 animate-pulse'
+                        : 'bg-emerald-100 text-emerald-600'
+                      }`}>
+                        {med.inventoryCount} left
+                      </div>
+                      {med.inventoryCount <= (med.inventoryWarningThreshold || 5) && (
+                        <span className="text-[10px] text-rose-500 font-bold flex items-center gap-1">
+                          <AlertCircle size={10} /> Low Stock
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex gap-1 mt-1">
                     {DAYS.map(d => (
                       <span 
                         key={d.value} 
@@ -380,6 +416,29 @@ export default function MedicineReminder() {
                         {day.label}
                       </button>
                     ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Total Pills</label>
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 30"
+                      value={inventoryCount}
+                      onChange={(e) => setInventoryCount(e.target.value)}
+                      className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Low Stock Alert</label>
+                    <input 
+                      type="number" 
+                      placeholder="e.g. 5"
+                      value={inventoryThreshold}
+                      onChange={(e) => setInventoryThreshold(e.target.value)}
+                      className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                    />
                   </div>
                 </div>
 

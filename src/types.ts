@@ -6,7 +6,9 @@ export interface Medicine {
   instructions: string;
   voiceEnabled: boolean;
   taken: boolean;
-  days: number[]; // 0 for Sunday, 1 for Monday, etc.
+  days: number[];
+  inventoryCount?: number;
+  inventoryWarningThreshold?: number;
 }
 
 export type AppView = 'scheduler' | 'active-alarm';
