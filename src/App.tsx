@@ -6,13 +6,17 @@
 import { useState } from 'react';
 import MedicineReminder from './components/MedicineReminder';
 import Entertainment from './components/Entertainment';
-import { Pill, Gamepad2 } from 'lucide-react';
+import AIChats from './components/AIChats';
+import BackgroundMusic from './components/BackgroundMusic';
+import { Pill, Gamepad2, MessageCircle } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'meds' | 'play'>('meds');
+  const [activeTab, setActiveTab] = useState<'meds' | 'play' | 'chat'>('meds');
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
+      <BackgroundMusic />
+      
       {/* Bottom Navigation for easy access on tablet */}
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 px-6 py-3 rounded-full shadow-2xl flex gap-8 z-[60]">
         <button 
@@ -21,6 +25,13 @@ export default function App() {
         >
           <Pill size={24} />
           <span className="text-[10px] font-bold uppercase tracking-widest">Health</span>
+        </button>
+        <button 
+          onClick={() => setActiveTab('chat')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'chat' ? 'text-indigo-500 scale-110' : 'text-gray-400 opacity-60'}`}
+        >
+          <MessageCircle size={24} />
+          <span className="text-[10px] font-bold uppercase tracking-widest">AI Chats</span>
         </button>
         <button 
           onClick={() => setActiveTab('play')}
@@ -32,7 +43,9 @@ export default function App() {
       </nav>
 
       <main className="flex-1 pb-24">
-        {activeTab === 'meds' ? <MedicineReminder /> : <Entertainment />}
+        {activeTab === 'meds' ? <MedicineReminder /> : 
+         activeTab === 'chat' ? <AIChats /> :
+         <Entertainment />}
       </main>
     </div>
   );

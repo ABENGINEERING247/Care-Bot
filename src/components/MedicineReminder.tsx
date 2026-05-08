@@ -24,6 +24,7 @@ export default function MedicineReminder() {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [activeAlarm, setActiveAlarm] = useState<Medicine | null>(null);
+  const [snoozedMeds, setSnoozedMeds] = useState<Record<string, number>>({});
   
   // Form State
   const [name, setName] = useState('');
@@ -54,12 +55,24 @@ export default function MedicineReminder() {
       const currentDay = now.getDay();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
       
-      const dueMed = meds.find(m => 
-        m.time === currentTime && 
-        !m.taken && 
-        m.days.includes(currentDay)
-      );
+      const dueMed = meds.find(m => {
+        const isScheduledTime = m.time === currentTime && m.days.includes(currentDay) && !m.taken;
+        const isSnoozeTime = snoozedMeds[m.id] && now.getTime() >= snoozedMeds[m.id];
+        
+        // Don't re-trigger if it was just snoozed for the future
+        if (isScheduledTime && snoozedMeds[m.id] && snoozedMeds[m.id] > now.getTime()) return false;
+        
+        return isScheduledTime || isSnoozeTime;
+      });
+
       if (dueMed && activeAlarm?.id !== dueMed.id) {
+        if (snoozedMeds[dueMed.id] && now.getTime() >= snoozedMeds[dueMed.id]) {
+          setSnoozedMeds(prev => {
+            const next = { ...prev };
+            delete next[dueMed.id];
+            return next;
+          });
+        }
         triggerAlarm(dueMed);
       }
     }, 1000);
@@ -90,15 +103,6 @@ export default function MedicineReminder() {
 
   const triggerAlarm = (med: Medicine) => {
     setActiveAlarm(med);
-  };
-
-  const speak = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.8; // Slower for clarity
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
-    }
   };
 
   const saveMedication = () => {
@@ -150,6 +154,22 @@ export default function MedicineReminder() {
     }
   };
 
+  const [voiceVolume, setVoiceVolume] = useState(() => {
+    const saved = localStorage.getItem('carebot_voice_volume');
+    return saved ? parseFloat(saved) : 1.0;
+  });
+
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Stop any current speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.8;
+      utterance.pitch = 1;
+      utterance.volume = voiceVolume;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const resetForm = () => {
     setName('');
     setTime('');
@@ -166,6 +186,37 @@ export default function MedicineReminder() {
 
   const acknowledgeMed = (id: string) => {
     setMeds(meds.map(m => m.id === id ? { ...m, taken: true } : m));
+    setSnoozedMeds(prev => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    setActiveAlarm(null);
+    window.speechSynthesis.cancel();
+  };
+
+  const snoozeMed = (id: string, minutes: number = 5) => {
+    const snoozeTime = Date.now() + minutes * 60 * 1000;
+    setSnoozedMeds(prev => ({ ...prev, [id]: snoozeTime }));
+    setActiveAlarm(null);
+    window.speechSynthesis.cancel();
+  };
+
+  const acknowledgeAllDue = () => {
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    setMeds(meds.map(m => {
+      const isDue = (m.days.includes(currentDay) && m.time === currentTime && !m.taken);
+      const isSnoozed = snoozedMeds[m.id] && now.getTime() >= snoozedMeds[m.id];
+      if (isDue || isSnoozed) {
+        return { ...m, taken: true };
+      }
+      return m;
+    }));
+
+    setSnoozedMeds({}); // Clear all snoozes
     setActiveAlarm(null);
     window.speechSynthesis.cancel();
   };
@@ -345,6 +396,29 @@ export default function MedicineReminder() {
                   </div>
                 </button>
 
+                {voice && (
+                  <div className="space-y-3 px-1">
+                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                      <span>Alarm Volume</span>
+                      <span>{Math.round(voiceVolume * 100)}%</span>
+                    </div>
+                    <input 
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={voiceVolume}
+                      onChange={(e) => {
+                        const newVol = parseFloat(e.target.value);
+                        setVoiceVolume(newVol);
+                        localStorage.setItem('carebot_voice_volume', newVol.toString());
+                        speak("Volume test");
+                      }}
+                      className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#E29578]"
+                    />
+                  </div>
+                )}
+
                 <button 
                   onClick={saveMedication}
                   className="w-full bg-[#1A1A1A] text-white py-5 rounded-[24px] font-bold text-lg hover:shadow-xl hover:shadow-black/10 transition-all active:scale-[0.98]"
@@ -389,9 +463,17 @@ export default function MedicineReminder() {
                   I HAVE TAKEN IT
                 </button>
                 <button 
-                  onClick={() => setActiveAlarm(null)}
-                  className="bg-transparent text-white/60 py-4 rounded-full font-bold hover:text-white transition-colors"
+                  onClick={acknowledgeAllDue}
+                  className="bg-white/20 text-white border border-white/40 py-4 rounded-[32px] font-black text-xl shadow-lg hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
+                  <CheckCircle2 size={24} />
+                  DISMISS ALL
+                </button>
+                <button 
+                  onClick={() => snoozeMed(activeAlarm.id, 5)}
+                  className="bg-transparent text-white/60 py-4 rounded-full font-bold hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <Clock size={20} />
                   Remind me in 5 mins
                 </button>
               </div>

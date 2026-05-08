@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Youtube, Trophy, ExternalLink, Play } from 'lucide-react';
+import { Youtube, Trophy, ExternalLink, Play, Bot, MessageSquare, Sparkles, Zap } from 'lucide-react';
 
 export default function Entertainment() {
   const links = [
