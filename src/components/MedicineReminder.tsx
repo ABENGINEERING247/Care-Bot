@@ -11,9 +11,18 @@ import {
   AlertCircle,
   Bell,
   X,
-  Edit2
+  Edit2,
+  Mic,
+  MicOff
 } from 'lucide-react';
 import { Medicine } from '../types';
+
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 export default function MedicineReminder() {
   const [meds, setMeds] = useState<Medicine[]>(() => {
@@ -60,6 +69,75 @@ export default function MedicineReminder() {
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [inventoryCount, setInventoryCount] = useState<string>('');
   const [inventoryThreshold, setInventoryThreshold] = useState<string>('5');
+  const [isListening, setIsListening] = useState(false);
+
+  const startVoiceInput = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice input is not supported in your browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onerror = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      console.log('Transcript:', transcript);
+      parseVoiceInput(transcript);
+    };
+
+    recognition.start();
+  };
+
+  const parseVoiceInput = (text: string) => {
+    // Basic Parsing Strategy
+    // Expected phrases: "Take [name] at [time] [dosage]" or similar
+    
+    // 1. Time extraction (HH:MM or H:MM)
+    const timeRegex = /(\d{1,2}):(\d{2})(\s+)?(am|pm)?/i;
+    const timeMatch = text.match(timeRegex);
+    if (timeMatch) {
+      let hours = parseInt(timeMatch[1]);
+      const minutes = timeMatch[2];
+      const ampm = timeMatch[4]?.toLowerCase();
+      
+      if (ampm === 'pm' && hours < 12) hours += 12;
+      if (ampm === 'am' && hours === 12) hours = 0;
+      
+      const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes}`;
+      setTime(formattedTime);
+    }
+
+    // 2. Dosage extraction (keywords: "tablet", "pill", "ml", "mg", "dose")
+    const dosageRegex = /(\d+(\.\d+)?\s?(tablet|pills|ml|mg|dose|tablespoon|teaspoon)s?)/i;
+    const dosageMatch = text.match(dosageRegex);
+    if (dosageMatch) {
+      setDosage(dosageMatch[1]);
+    }
+
+    // 3. Name extraction
+    // Heuristic: Remove the words "take", "at", the time, the dosage, and cleaning up
+    let cleanedName = text
+      .replace(/take/i, '')
+      .replace(/at/i, '')
+      .replace(timeRegex, '')
+      .replace(dosageRegex, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Capitalize first letter
+    if (cleanedName) {
+      cleanedName = cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
+      setName(cleanedName);
+    }
+  };
 
   const DAYS = [
     { label: 'S', value: 0, full: 'Sunday' },
@@ -393,7 +471,20 @@ export default function MedicineReminder() {
 
               <div className="space-y-6">
                 <div className="space-y-2 relative">
-                  <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Medicine Name</label>
+                  <div className="flex justify-between items-center">
+                    <label className="text-xs font-bold uppercase tracking-widest text-gray-400">Medicine Name</label>
+                    <button 
+                      onClick={startVoiceInput}
+                      className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all ${
+                        isListening 
+                        ? 'bg-rose-500 text-white animate-pulse' 
+                        : 'bg-indigo-50 text-indigo-500 hover:bg-indigo-100'
+                      }`}
+                    >
+                      {isListening ? <MicOff size={12} /> : <Mic size={12} />}
+                      {isListening ? 'Listening...' : 'Voice Input'}
+                    </button>
+                  </div>
                   <input 
                     autoFocus
                     type="text" 
