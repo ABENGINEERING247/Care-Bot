@@ -10,11 +10,12 @@ import Entertainment from './components/Entertainment';
 import AIChats from './components/AIChats';
 import BluetoothController from './components/BluetoothController';
 import PharmacyDelivery from './components/PharmacyDelivery';
+import WelcomePage from './components/WelcomePage';
 import BackgroundMusic from './components/BackgroundMusic';
-import { Pill, Gamepad2, MessageCircle, Zap, ShoppingBag } from 'lucide-react';
+import { Pill, Gamepad2, MessageCircle, Zap, ShoppingBag, Home } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'meds' | 'play' | 'chat' | 'remote' | 'shop'>('meds');
+  const [activeTab, setActiveTab] = useState<'home' | 'meds' | 'play' | 'chat' | 'remote' | 'shop'>('home');
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
@@ -40,6 +41,13 @@ export default function App() {
       
       {/* Bottom Navigation for easy access on tablet */}
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 px-6 py-3 rounded-full shadow-2xl flex gap-8 z-[60]">
+        <button 
+          onClick={() => setActiveTab('home')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'home' ? 'text-gray-900 scale-110' : 'text-gray-400 opacity-60'}`}
+        >
+          <Home size={24} />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Home</span>
+        </button>
         <button 
           onClick={() => setActiveTab('meds')}
           className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'meds' ? 'text-[#E29578] scale-110' : 'text-gray-400 opacity-60'}`}
@@ -78,7 +86,8 @@ export default function App() {
       </nav>
 
       <main className="flex-1 pb-24">
-        {activeTab === 'meds' ? <MedicineReminder /> : 
+        {activeTab === 'home' ? <WelcomePage onNavigate={setActiveTab} /> :
+         activeTab === 'meds' ? <MedicineReminder /> : 
          activeTab === 'chat' ? <AIChats /> :
          activeTab === 'remote' ? <BluetoothController /> :
          activeTab === 'shop' ? <PharmacyDelivery /> :
