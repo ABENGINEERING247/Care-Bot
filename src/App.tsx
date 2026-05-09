@@ -9,11 +9,12 @@ import MedicineReminder from './components/MedicineReminder';
 import Entertainment from './components/Entertainment';
 import AIChats from './components/AIChats';
 import BluetoothController from './components/BluetoothController';
+import PharmacyDelivery from './components/PharmacyDelivery';
 import BackgroundMusic from './components/BackgroundMusic';
-import { Pill, Gamepad2, MessageCircle, Zap } from 'lucide-react';
+import { Pill, Gamepad2, MessageCircle, Zap, ShoppingBag } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'meds' | 'play' | 'chat' | 'remote'>('meds');
+  const [activeTab, setActiveTab] = useState<'meds' | 'play' | 'chat' | 'remote' | 'shop'>('meds');
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
@@ -61,6 +62,13 @@ export default function App() {
           <span className="text-[10px] font-bold uppercase tracking-widest">Remote</span>
         </button>
         <button 
+          onClick={() => setActiveTab('shop')}
+          className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'shop' ? 'text-emerald-500 scale-110' : 'text-gray-400 opacity-60'}`}
+        >
+          <ShoppingBag size={24} />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Pharmacy</span>
+        </button>
+        <button 
           onClick={() => setActiveTab('play')}
           className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'play' ? 'text-[#3282B8] scale-110' : 'text-gray-400 opacity-60'}`}
         >
@@ -73,6 +81,7 @@ export default function App() {
         {activeTab === 'meds' ? <MedicineReminder /> : 
          activeTab === 'chat' ? <AIChats /> :
          activeTab === 'remote' ? <BluetoothController /> :
+         activeTab === 'shop' ? <PharmacyDelivery /> :
          <Entertainment />}
         
         <footer className="mt-12 mb-8 text-center border-t border-gray-100 pt-8 opacity-60">
