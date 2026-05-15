@@ -39,8 +39,8 @@ export default function AIChats() {
         <div className="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center mb-4 mx-auto md:mx-0">
           <MessageCircle size={28} />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">AI Assistants</h2>
-        <p className="text-gray-500">Intelligent chat companions to help you with anything.</p>
+        <h2 className="text-3xl font-black text-gray-900 mb-2">AI Assistants</h2>
+        <p className="text-gray-500 font-medium">Intelligent chat companions to help you with anything.</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6">
@@ -57,7 +57,7 @@ export default function AIChats() {
             </div>
 
             <div className="flex-1 text-center md:text-left">
-              <h3 className="text-2xl font-bold text-gray-900 mb-1">{item.title}</h3>
+              <h3 className="text-2xl font-black text-gray-900 mb-1">{item.title}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
             </div>
 
@@ -65,17 +65,17 @@ export default function AIChats() {
               href={item.url} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="w-full md:w-auto px-8 py-4 bg-[#1A1A1A] text-white rounded-[24px] font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all active:scale-95 whitespace-nowrap"
+              className="w-full md:w-auto px-8 py-4 bg-black text-white rounded-[24px] font-black flex items-center justify-center gap-2 hover:bg-gray-800 transition-all active:scale-95 whitespace-nowrap"
             >
               Chat Now
-              <ExternalLink size={14} className="opacity-50" />
+              <ExternalLink size={14} />
             </a>
           </motion.div>
         ))}
       </div>
 
-      <div className="mt-12 bg-gray-50 border border-gray-100 p-8 rounded-[40px] text-center italic">
-        <p className="text-gray-500 text-xs">These links open the official websites of the respective AI services.</p>
+      <div className="mt-12 bg-[#F9FAFB] p-8 rounded-[40px] text-center italic">
+        <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">These links open the official websites of the respective AI services.</p>
       </div>
     </div>
   );

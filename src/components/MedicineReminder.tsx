@@ -344,18 +344,18 @@ export default function MedicineReminder() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 min-h-screen font-sans bg-[#F9FAFB]">
+    <div className="max-w-2xl mx-auto p-6 min-h-screen font-sans">
       {/* Header */}
       <header className="flex justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Pill className="text-[#E29578]" /> CareBot Meds
           </h1>
-          <p className="text-gray-500 text-sm">Reliable reminders for your health</p>
+          <p className="text-gray-500">Reliable reminders for your health</p>
         </div>
         <button 
           onClick={() => setIsAdding(true)}
-          className="bg-[#1A1A1A] hover:bg-gray-800 text-white p-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-black/10"
+          className="bg-[#E29578] hover:bg-[#d08467] text-white p-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-[#E29578]/20"
         >
           <Plus size={24} />
         </button>
@@ -364,8 +364,8 @@ export default function MedicineReminder() {
       {/* Med List */}
       <div className="space-y-4">
         {meds.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-200">
-            <AlertCircle className="mx-auto text-gray-300 mb-2" size={48} />
+          <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-gray-100">
+            <AlertCircle className="mx-auto text-gray-200 mb-2" size={48} />
             <p className="text-gray-400">No medicines scheduled yet.</p>
           </div>
         ) : (
@@ -377,11 +377,11 @@ export default function MedicineReminder() {
               animate={{ opacity: 1, y: 0 }}
               className={`flex items-center gap-4 p-5 rounded-3xl border transition-all ${
                 med.taken 
-                  ? 'bg-gray-50 border-transparent opacity-60' 
+                  ? 'bg-gray-50/50 border-transparent opacity-40' 
                   : 'bg-white border-gray-100 shadow-sm'
               }`}
             >
-              <div className={`p-4 rounded-2xl ${med.taken ? 'bg-gray-100' : 'bg-[#E29578]/10 text-[#E29578]'}`}>
+              <div className={`p-4 rounded-2xl ${med.taken ? 'bg-gray-100 text-gray-400' : 'bg-[#E29578]/10 text-[#E29578]'}`}>
                 <Clock size={24} />
               </div>
               
@@ -390,22 +390,22 @@ export default function MedicineReminder() {
                   <h3 className={`font-bold text-lg ${med.taken ? 'line-through text-gray-400' : 'text-gray-900'}`}>
                     {med.name}
                   </h3>
-                  {med.voiceEnabled ? <Volume2 size={14} className="text-gray-400" /> : <VolumeX size={14} className="text-gray-300" />}
+                  {med.voiceEnabled ? <Volume2 size={14} className="text-[#E29578]" /> : <VolumeX size={14} className="text-gray-300" />}
                 </div>
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm text-gray-500">{med.time} • {med.dosage}</p>
+                  <p className={`text-sm ${med.taken ? 'text-gray-400' : 'text-gray-500'}`}>{med.time} • {med.dosage}</p>
                   
                   {med.inventoryCount !== undefined && (
                     <div className="flex items-center gap-2 mt-1">
                       <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         med.inventoryCount <= (med.inventoryWarningThreshold || 5)
-                        ? 'bg-rose-100 text-rose-600 animate-pulse'
-                        : 'bg-emerald-100 text-emerald-600'
+                        ? 'bg-red-50 text-red-600 animate-pulse'
+                        : 'bg-gray-100 text-gray-600'
                       }`}>
                         {med.inventoryCount} left
                       </div>
                       {med.inventoryCount <= (med.inventoryWarningThreshold || 5) && (
-                        <span className="text-[10px] text-rose-500 font-bold flex items-center gap-1">
+                        <span className="text-[10px] text-red-500 font-bold flex items-center gap-1">
                           <AlertCircle size={10} /> Low Stock
                         </span>
                       )}
@@ -436,7 +436,7 @@ export default function MedicineReminder() {
                     </button>
                     <button 
                       onClick={() => startEditing(med)}
-                      className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
+                      className="p-3 bg-gray-50 text-gray-400 rounded-xl hover:bg-gray-100 transition-colors"
                     >
                       <Edit2 size={20} />
                     </button>
@@ -444,7 +444,7 @@ export default function MedicineReminder() {
                 )}
                 <button 
                   onClick={() => removeMed(med.id)}
-                  className="p-3 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-colors"
+                  className="p-3 bg-red-50 text-red-400 rounded-xl hover:bg-red-100 transition-colors"
                 >
                   <Trash2 size={20} />
                 </button>
@@ -457,16 +457,16 @@ export default function MedicineReminder() {
       {/* Add Dialog Overlay */}
       <AnimatePresence>
         {isAdding && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl"
+              className="bg-white w-full max-w-md rounded-[40px] p-8 shadow-2xl relative overflow-hidden"
             >
               <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold">{editingId ? 'Edit Reminder' : 'New Reminder'}</h2>
-                <button onClick={() => { setIsAdding(false); resetForm(); }} className="bg-gray-100 p-2 rounded-full"><X size={20}/></button>
+                <h2 className="text-2xl font-bold text-gray-900">{editingId ? 'Edit Reminder' : 'New Reminder'}</h2>
+                <button onClick={() => { setIsAdding(false); resetForm(); }} className="bg-gray-50 p-2 rounded-full text-gray-400"><X size={20}/></button>
               </div>
 
               <div className="space-y-6">
@@ -478,7 +478,7 @@ export default function MedicineReminder() {
                       className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full transition-all ${
                         isListening 
                         ? 'bg-rose-500 text-white animate-pulse' 
-                        : 'bg-indigo-50 text-indigo-500 hover:bg-indigo-100'
+                        : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
                       {isListening ? <MicOff size={12} /> : <Mic size={12} />}
@@ -495,17 +495,17 @@ export default function MedicineReminder() {
                       setShowSuggestions(true);
                     }}
                     onFocus={() => setShowSuggestions(true)}
-                    className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                    className="w-full bg-gray-50 p-4 rounded-2xl text-lg text-gray-900 border-none focus:ring-2 focus:ring-[#E29578] outline-none"
                   />
                   {showSuggestions && (
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-100 rounded-[24px] shadow-2xl z-[60] py-2 max-h-60 overflow-y-auto"
+                      className="absolute left-0 right-0 top-full mt-2 bg-white rounded-[24px] shadow-2xl border border-gray-100 z-[60] py-2 max-h-60 overflow-y-auto"
                     >
                       <div className="px-4 py-2 border-b border-gray-50 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-gray-400">
                         <span>Popular Suggestions</span>
-                        <button onClick={() => setShowSuggestions(false)} className="hover:text-gray-600">Close</button>
+                        <button onClick={() => setShowSuggestions(false)} className="hover:text-[#E29578]">Close</button>
                       </div>
                       {POPULAR_MEDS.filter(m => m.name.toLowerCase().includes(name.toLowerCase())).map((med, idx) => (
                         <button
@@ -517,7 +517,7 @@ export default function MedicineReminder() {
                           className="w-full px-5 py-3 hover:bg-gray-50 text-left flex items-center justify-between transition-colors"
                         >
                           <span className="font-bold text-gray-700">{med.name}</span>
-                          <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${med.type === 'Tablet' ? 'bg-indigo-50 text-indigo-500' : 'bg-rose-50 text-rose-500'}`}>
+                          <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${med.type === 'Tablet' ? 'bg-blue-50 text-blue-500' : 'bg-amber-50 text-amber-500'}`}>
                             {med.type}
                           </span>
                         </button>
@@ -538,7 +538,7 @@ export default function MedicineReminder() {
                       type="time" 
                       value={time}
                       onChange={(e) => setTime(e.target.value)}
-                      className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                      className="w-full bg-gray-50 p-4 rounded-2xl text-lg text-gray-900 border-none focus:ring-2 focus:ring-[#E29578] outline-none"
                     />
                   </div>
                   <div className="space-y-2">
@@ -548,7 +548,7 @@ export default function MedicineReminder() {
                       placeholder="e.g. 500mg"
                       value={dosage}
                       onChange={(e) => setDosage(e.target.value)}
-                      className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                      className="w-full bg-gray-50 p-4 rounded-2xl text-lg text-gray-900 border-none focus:ring-2 focus:ring-[#E29578] outline-none"
                     />
                   </div>
                 </div>
@@ -562,8 +562,8 @@ export default function MedicineReminder() {
                         onClick={() => toggleDay(day.value)}
                         className={`w-10 h-10 rounded-xl font-bold transition-all ${
                           selectedDays.includes(day.value) 
-                            ? 'bg-[#E29578] text-white' 
-                            : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                            ? 'bg-[#E29578] text-white shadow-lg' 
+                            : 'bg-gray-50 text-gray-300 hover:bg-gray-100'
                         }`}
                       >
                         {day.label}
@@ -580,7 +580,7 @@ export default function MedicineReminder() {
                       placeholder="e.g. 30"
                       value={inventoryCount}
                       onChange={(e) => setInventoryCount(e.target.value)}
-                      className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                      className="w-full bg-gray-50 p-4 rounded-2xl text-lg text-gray-900 border-none focus:ring-2 focus:ring-[#E29578] outline-none"
                     />
                   </div>
                   <div className="space-y-2">
@@ -590,27 +590,27 @@ export default function MedicineReminder() {
                       placeholder="e.g. 5"
                       value={inventoryThreshold}
                       onChange={(e) => setInventoryThreshold(e.target.value)}
-                      className="w-full bg-gray-50 border-none p-4 rounded-2xl text-lg focus:ring-2 focus:ring-[#E29578] outline-none"
+                      className="w-full bg-gray-50 p-4 rounded-2xl text-lg text-gray-900 border-none focus:ring-2 focus:ring-[#E29578] outline-none"
                     />
                   </div>
                 </div>
 
                 <button 
                   onClick={() => setVoice(!voice)}
-                  className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${voice ? 'bg-[#E29578]/10 text-[#E29578] border border-[#E29578]/20' : 'bg-gray-50 text-gray-400'}`}
+                  className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${voice ? 'bg-[#E29578]/10 text-[#E29578]' : 'bg-gray-50 text-gray-400'}`}
                 >
                   <div className="flex items-center gap-3">
                     {voice ? <Volume2 /> : <VolumeX />}
-                    <span className="font-medium">Voice Alarms</span>
+                    <span className="font-bold uppercase tracking-widest text-xs">Voice Alarms</span>
                   </div>
-                  <div className={`w-10 h-6 rounded-full relative transition-colors ${voice ? 'bg-[#E29578]' : 'bg-gray-300'}`}>
+                  <div className={`w-10 h-6 rounded-full relative transition-colors ${voice ? 'bg-[#E29578]' : 'bg-gray-200'}`}>
                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${voice ? 'left-5' : 'left-1'}`} />
                   </div>
                 </button>
 
                 {voice && (
-                  <div className="space-y-3 px-1">
-                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                  <div className="space-y-3 px-1 text-gray-400">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                       <span>Alarm Volume</span>
                       <span>{Math.round(voiceVolume * 100)}%</span>
                     </div>
@@ -633,7 +633,7 @@ export default function MedicineReminder() {
 
                 <button 
                   onClick={saveMedication}
-                  className="w-full bg-[#1A1A1A] text-white py-5 rounded-[24px] font-bold text-lg hover:shadow-xl hover:shadow-black/10 transition-all active:scale-[0.98]"
+                  className="w-full bg-black text-white py-5 rounded-[24px] font-black text-lg hover:bg-gray-800 transition-all active:scale-[0.98]"
                 >
                   {editingId ? 'Update Reminder' : 'Save Reminder'}
                 </button>
@@ -646,56 +646,47 @@ export default function MedicineReminder() {
       {/* Active Alarm UI */}
       <AnimatePresence>
         {activeAlarm && (
-          <div className="fixed inset-0 bg-rose-500 z-[100] flex items-center justify-center p-6 text-white text-center overflow-hidden">
+          <div className="fixed inset-0 bg-[#E29578] z-[100] flex items-center justify-center p-6 text-white text-center">
             <motion.div 
-              animate={{ 
-                scale: [1, 1.05, 1],
-                rotate: [0, 1, -1, 0]
-              }}
+              animate={{ scale: [1, 1.05, 1] }}
               transition={{ repeat: Infinity, duration: 2 }}
-              className="relative z-10 space-y-10"
+              className="space-y-10"
             >
-              <div className="w-32 h-32 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+              <div className="w-32 h-32 bg-white/20 text-white rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
                 <Bell size={64} />
               </div>
               
               <div className="space-y-4">
                 <h2 className="text-6xl font-black uppercase tracking-tighter">Time for Medicine!</h2>
                 <div className="bg-white/10 backdrop-blur-md p-8 rounded-[40px] border border-white/20">
-                  <h3 className="text-4xl font-bold mb-2">{activeAlarm.name}</h3>
-                  <p className="text-2xl opacity-80">{activeAlarm.dosage}</p>
+                  <h3 className="text-4xl font-black mb-2">{activeAlarm.name}</h3>
+                  <p className="text-2xl font-bold opacity-80 uppercase tracking-widest">{activeAlarm.dosage}</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 w-full max-w-sm mx-auto">
                 <button 
                   onClick={() => acknowledgeMed(activeAlarm.id)}
-                  className="bg-white text-rose-500 py-6 rounded-[32px] font-black text-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all"
+                  className="bg-white text-[#E29578] py-6 rounded-[32px] font-black text-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all uppercase tracking-tighter"
                 >
                   I HAVE TAKEN IT
                 </button>
                 <button 
                   onClick={acknowledgeAllDue}
-                  className="bg-white/20 text-white border border-white/40 py-4 rounded-[32px] font-black text-xl shadow-lg hover:bg-white/30 transition-all active:scale-95 flex items-center justify-center gap-3"
+                  className="bg-black/20 text-white border border-white/20 py-4 rounded-[32px] font-black text-xl shadow-lg hover:bg-black/30 transition-all active:scale-95 flex items-center justify-center gap-3 uppercase tracking-widest"
                 >
                   <CheckCircle2 size={24} />
                   DISMISS ALL
                 </button>
                 <button 
                   onClick={() => snoozeMed(activeAlarm.id, 5)}
-                  className="bg-transparent text-white/60 py-4 rounded-full font-bold hover:text-white transition-colors flex items-center justify-center gap-2"
+                  className="bg-transparent text-white/60 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:text-white transition-colors flex items-center justify-center gap-2"
                 >
                   <Clock size={20} />
                   Remind me in 5 mins
                 </button>
               </div>
             </motion.div>
-            
-            {/* Background decorative elements */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" />
-              <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse delay-1000" />
-            </div>
           </div>
         )}
       </AnimatePresence>

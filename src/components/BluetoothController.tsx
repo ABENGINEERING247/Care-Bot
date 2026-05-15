@@ -64,13 +64,10 @@ export default function BluetoothController() {
 
   const ControlButton = ({ cmd, icon: Icon, color, label }: { cmd: string, icon: any, color: string, label: string }) => (
     <button
-      onMouseDown={() => sendCommand(cmd)}
-      onMouseUp={() => sendCommand('S')} // Optional: Stop on release
-      onTouchStart={() => sendCommand(cmd)}
-      onTouchEnd={() => sendCommand('S')}
-      className={`relative w-24 h-24 rounded-3xl flex flex-col items-center justify-center gap-1 transition-all active:scale-90 shadow-lg ${
-        lastCommand === cmd ? 'bg-white scale-95 shadow-inner' : `${color} text-white`
-      } ${status !== 'connected' ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:brightness-110'}`}
+      onClick={() => sendCommand(cmd)}
+      className={`relative w-24 h-24 rounded-3xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 shadow-lg ${
+        lastCommand === cmd ? 'bg-black text-white' : `${color} text-gray-900`
+      } ${status !== 'connected' ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:bg-gray-50'}`}
       disabled={status !== 'connected'}
     >
       <Icon size={32} />
@@ -82,17 +79,17 @@ export default function BluetoothController() {
     <div className="max-w-2xl mx-auto p-6 font-sans">
       <header className="mb-8 bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Robot Remote</h2>
-          <p className="text-gray-500">Control your Bluetooth enabled devices.</p>
+          <h2 className="text-3xl font-black text-gray-900 mb-2">Robot Remote</h2>
+          <p className="text-gray-500 font-medium">Control your Bluetooth enabled devices.</p>
         </div>
         
         <button
           onClick={status === 'connected' ? () => device?.gatt?.disconnect() : connect}
           disabled={isConnecting}
-          className={`px-6 py-4 rounded-[24px] font-bold flex items-center gap-3 transition-all ${
+          className={`px-6 py-4 rounded-[24px] font-black flex items-center gap-3 transition-all uppercase tracking-widest text-xs ${
             status === 'connected' 
-              ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
-              : 'bg-[#1A1A1A] text-white hover:bg-gray-800'
+              ? 'bg-blue-50 text-blue-500 shadow-inner' 
+              : 'bg-black text-white hover:bg-gray-800 shadow-lg'
           }`}
         >
           {isConnecting ? (
@@ -104,56 +101,63 @@ export default function BluetoothController() {
         </button>
       </header>
 
-      {status === 'connected' ? (
-        <div className="flex flex-col items-center gap-8 py-10">
-          {/* Top Row */}
-          <ControlButton cmd="F" icon={ChevronUp} color="bg-blue-500" label="Forward" />
+      <div className="flex flex-col items-center gap-4 py-10">
+        {/* Top Row */}
+        <ControlButton cmd="F" icon={ChevronUp} color="bg-gray-100" label="Forward" />
 
-          {/* Middle Row */}
-          <div className="flex gap-8 items-center">
-            <ControlButton cmd="L" icon={ChevronLeft} color="bg-blue-500" label="Left" />
-            <button
-              onClick={() => sendCommand('S')}
-              className="w-24 h-24 bg-red-500 text-white rounded-full flex flex-col items-center justify-center gap-1 shadow-xl hover:bg-red-600 transition-all active:scale-90"
-            >
-              <Square size={32} fill="currentColor" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Stop</span>
-            </button>
-            <ControlButton cmd="R" icon={ChevronRight} color="bg-blue-500" label="Right" />
-          </div>
-
-          {/* Bottom Row */}
-          <ControlButton cmd="B" icon={ChevronDown} color="bg-blue-500" label="Reverse" />
-          
-          <div className="mt-8 flex gap-4">
-               <button onClick={() => sendCommand('1')} className="px-6 py-3 bg-gray-100 rounded-2xl text-xs font-bold hover:bg-gray-200">AUX 1</button>
-               <button onClick={() => sendCommand('2')} className="px-6 py-3 bg-gray-100 rounded-2xl text-xs font-bold hover:bg-gray-200">AUX 2</button>
-          </div>
+        {/* Middle Row */}
+        <div className="flex gap-8 items-center">
+          <ControlButton cmd="L" icon={ChevronLeft} color="bg-gray-100" label="Left" />
+          <button
+            onClick={() => sendCommand('S')}
+            className={`w-24 h-24 bg-rose-500 text-white rounded-full flex flex-col items-center justify-center gap-1 shadow-lg hover:bg-rose-600 transition-all active:scale-90 ${status !== 'connected' ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+            disabled={status !== 'connected'}
+          >
+            <Square size={32} fill="currentColor" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Stop</span>
+          </button>
+          <ControlButton cmd="R" icon={ChevronRight} color="bg-gray-100" label="Right" />
         </div>
-      ) : (
+
+        {/* Bottom Row */}
+        <ControlButton cmd="B" icon={ChevronDown} color="bg-gray-100" label="Backward" />
+      </div>
+
+      {status !== 'connected' && (
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-white/50 backdrop-blur-sm border-2 border-dashed border-gray-200 rounded-[40px] py-20 flex flex-col items-center text-center px-10"
+          className="mt-4 bg-[#F9FAFB] border border-dashed border-gray-200 rounded-[32px] p-6 flex flex-col items-center text-center"
         >
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-6">
-            <Zap size={32} />
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 mb-4">
+            <Zap size={20} />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No Robot Connected</h3>
-          <p className="text-gray-500 max-w-xs mb-8 text-sm">Bring your Bluetooth device close and tap "Connect Robot" to start controlling it.</p>
+          <h3 className="text-sm font-black text-gray-900 mb-1 uppercase tracking-tight">Robot Not Linked</h3>
+          <p className="text-gray-400 max-w-xs mb-4 text-[11px] font-medium leading-relaxed">Tap "Connect Robot" at the top to start controlling your hardware.</p>
           
-          <div className="flex items-start gap-3 text-left bg-blue-50 p-4 rounded-2xl max-w-sm">
-            <Info className="text-blue-500 shrink-0 mt-0.5" size={18} />
-            <p className="text-[11px] text-blue-700 leading-relaxed">
-              Ensure your Arduino is running a standard Serial Bluetooth sketch (9600 baud) and listening for characters: 'F', 'B', 'L', 'R', and 'S'.
+          <div className="flex items-start gap-2 text-left bg-blue-50 p-3 rounded-xl max-w-sm">
+            <Info className="text-blue-500 shrink-0 mt-0.5" size={14} />
+            <p className="text-[9px] text-blue-800 leading-relaxed">
+              Arduino Serial: Listening for 'F', 'B', 'L', 'R', and 'S'. (9600 baud)
             </p>
           </div>
         </motion.div>
       )}
 
       {status === 'error' && (
-        <div className="mt-6 p-4 bg-red-50 text-red-600 rounded-2xl text-center text-sm font-medium">
-          Connection failed. Make sure Bluetooth is enabled and the device is in range.
+        <div className="mt-6 flex flex-col gap-3">
+          <div className="p-4 bg-rose-50 text-rose-500 rounded-2xl text-center text-xs font-bold uppercase tracking-widest">
+            Connection failed. Make sure Bluetooth is enabled and the device is in range.
+          </div>
+          
+          <div className="p-4 bg-gray-50 border border-black rounded-2xl text-center">
+            <p className="text-black text-xs font-bold mb-2">💡 Iframe Restriction Detected</p>
+            <p className="text-gray-500 text-[10px] leading-relaxed">
+              Web Bluetooth is often blocked in embedded windows. If you see a "Disallowed by Permission Policy" error, please 
+              <span className="text-black font-bold block mt-1 uppercase tracking-widest">OPEN THIS APP IN A NEW TAB</span>
+              to enable secure device connection.
+            </p>
+          </div>
         </div>
       )}
     </div>

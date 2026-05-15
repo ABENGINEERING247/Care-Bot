@@ -78,22 +78,22 @@ export default function PharmacyDelivery() {
           </div>
           <div className="text-center md:text-left">
             <h2 className="text-4xl font-black text-gray-900 mb-2 tracking-tight">Medicine Delivery</h2>
-            <p className="text-gray-500 text-lg">Order original medications from trusted companies in Pakistan.</p>
+            <p className="text-gray-500 text-lg font-medium">Order original medications from trusted companies in Pakistan.</p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-10">
           <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-2xl">
             <Truck className="text-emerald-500" size={20} />
-            <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">Fast Delivery</span>
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Fast Delivery</span>
           </div>
           <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-2xl">
-            <ShieldCheck className="text-blue-500" size={20} />
-            <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">100% Original</span>
+            <ShieldCheck className="text-emerald-500" size={20} />
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">100% Original</span>
           </div>
           <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-2xl">
-            <Clock className="text-amber-500" size={20} />
-            <span className="text-xs font-bold text-gray-600 uppercase tracking-widest">24/7 Support</span>
+            <Clock className="text-emerald-500" size={20} />
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">24/7 Support</span>
           </div>
         </div>
       </header>
@@ -105,7 +105,7 @@ export default function PharmacyDelivery() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="group bg-white border border-gray-100 p-6 rounded-[32px] shadow-sm hover:shadow-xl transition-all cursor-pointer flex flex-col gap-4"
+            className="group bg-white border border-gray-100 p-6 rounded-[32px] shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all cursor-pointer flex flex-col gap-4"
             onClick={() => window.open(shop.url, '_blank')}
           >
             <div className="flex items-start justify-between">
@@ -113,31 +113,31 @@ export default function PharmacyDelivery() {
                 {shop.label}
               </div>
               <div className="p-2 bg-gray-50 rounded-xl group-hover:bg-emerald-50 transition-colors">
-                <ExternalLink className="text-gray-400 group-hover:text-emerald-500" size={18} />
+                <ExternalLink className="text-gray-300 group-hover:text-emerald-500" size={18} />
               </div>
             </div>
 
             <div>
               <h3 className="text-xl font-black text-gray-900 mb-1">{shop.name}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{shop.description}</p>
+              <p className="text-gray-500 text-sm leading-relaxed font-medium">{shop.description}</p>
             </div>
 
             <div className="pt-4 border-t border-gray-50 mt-auto flex items-center justify-between">
               <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${shop.accent}`}>Verified Pakistan Company</span>
-              <button className="text-[11px] font-bold text-gray-400 group-hover:text-black transition-colors">Visit Store →</button>
+              <button className="text-[11px] font-bold text-gray-300 group-hover:text-emerald-500 transition-colors">Visit Store →</button>
             </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="mt-12 bg-[#1A1A1A] p-8 rounded-[40px] text-center dark">
-        <h3 className="text-white font-bold text-lg mb-2">Need a specific medicine?</h3>
-        <p className="text-gray-400 text-sm mb-6">Search across multiple platforms for the best price and availability.</p>
-        <div className="flex bg-white/10 rounded-2xl p-1 max-w-md mx-auto focus-within:ring-2 ring-emerald-500">
+      <div className="mt-12 bg-gray-50 p-8 rounded-[40px] text-center">
+        <h3 className="text-gray-900 font-bold text-lg mb-2">Need a specific medicine?</h3>
+        <p className="text-gray-500 text-sm mb-6 font-medium">Search across multiple platforms for the best price and availability.</p>
+        <div className="flex bg-white rounded-2xl p-1 max-w-md mx-auto focus-within:ring-2 ring-emerald-500 shadow-sm border border-gray-100">
           <input 
             type="text" 
             placeholder="Search medicine brand..." 
-            className="bg-transparent text-white px-4 py-3 flex-1 outline-none text-sm"
+            className="px-4 py-3 flex-1 outline-none text-sm text-gray-900 bg-transparent"
           />
           <button className="bg-emerald-500 text-white p-3 rounded-xl hover:bg-emerald-600 transition-colors">
             <Search size={20} />

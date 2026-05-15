@@ -12,27 +12,27 @@ export default function WelcomePage({ onNavigate }: WelcomePageProps) {
       title: 'Medicine Manager',
       description: 'Schedule your pills and track daily doses.',
       icon: Pill,
-      color: 'bg-rose-500',
-      lightColor: 'bg-rose-50',
-      textColor: 'text-rose-600'
+      color: 'bg-[#E29578]',
+      lightColor: 'bg-[#E29578]/10',
+      textColor: 'text-[#E29578]'
     },
     {
       id: 'remote',
       title: 'HC-05 Remote',
       description: 'Connect and control your hardware via Bluetooth.',
       icon: Zap,
-      color: 'bg-amber-500',
-      lightColor: 'bg-amber-50',
-      textColor: 'text-amber-600'
+      color: 'bg-blue-500',
+      lightColor: 'bg-blue-50/50',
+      textColor: 'text-blue-500'
     },
     {
       id: 'chat',
       title: 'AI Care Chat',
       description: 'Ask anything about your health or medicines.',
       icon: MessageCircle,
-      color: 'bg-[#E29578]',
-      lightColor: 'bg-[#E29578]/10',
-      textColor: 'text-[#B56D53]'
+      color: 'bg-indigo-500',
+      lightColor: 'bg-indigo-50',
+      textColor: 'text-indigo-500'
     },
     {
       id: 'shop',
@@ -41,16 +41,16 @@ export default function WelcomePage({ onNavigate }: WelcomePageProps) {
       icon: ShoppingBag,
       color: 'bg-emerald-500',
       lightColor: 'bg-emerald-50',
-      textColor: 'text-emerald-600'
+      textColor: 'text-emerald-500'
     },
     {
       id: 'play',
       title: 'Entertainment',
       description: 'Relax with music and mindful activities.',
       icon: Gamepad2,
-      color: 'bg-[#3282B8]',
-      lightColor: 'bg-[#3282B8]/10',
-      textColor: 'text-[#1F5F8B]'
+      color: 'bg-amber-500',
+      lightColor: 'bg-amber-50',
+      textColor: 'text-amber-500'
     }
   ];
 
@@ -61,14 +61,14 @@ export default function WelcomePage({ onNavigate }: WelcomePageProps) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12 mt-8"
       >
-        <div className="inline-flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-full text-rose-600 mb-6 font-bold text-xs uppercase tracking-widest">
-          <Heart size={14} className="fill-current" />
+        <div className="inline-flex items-center gap-2 bg-[#E29578]/10 px-4 py-2 rounded-full text-[#E29578] mb-6 font-bold text-xs uppercase tracking-widest">
+          <Heart size={14} className="fill-current text-[#E29578]" />
           CareBot Personal Assistant
         </div>
         <h1 className="text-5xl font-black text-gray-900 mb-4 tracking-tight leading-tight">
           Welcome to <span className="text-[#E29578]">CareBot</span>
         </h1>
-        <p className="text-gray-500 text-lg max-w-xl mx-auto">
+        <p className="text-gray-500 text-lg max-w-xl mx-auto font-medium">
           Your smart medicine assistant designed for better health and easier medication management.
         </p>
       </motion.div>
@@ -91,7 +91,7 @@ export default function WelcomePage({ onNavigate }: WelcomePageProps) {
               <h3 className="text-xl font-black text-gray-900 mb-1">{item.title}</h3>
               <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
             </div>
-            <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 group-hover:bg-gray-900 group-hover:text-white transition-all">
+            <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 group-hover:bg-black group-hover:text-white transition-all">
               <ChevronRight size={20} />
             </div>
           </motion.div>
@@ -102,11 +102,11 @@ export default function WelcomePage({ onNavigate }: WelcomePageProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.8 }}
-        className="mt-16 bg-[#1A1A1A] p-10 rounded-[48px] text-white text-center dark relative overflow-hidden"
+        className="mt-16 bg-[#1A1A1A] p-10 rounded-[48px] text-white text-center relative overflow-hidden shadow-2xl"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#E29578] opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <h2 className="text-2xl font-black mb-2">Smart Care for Your Elders</h2>
-        <p className="text-gray-400 mb-0">Experience the future of healthcare assistance at your fingertips.</p>
+        <h2 className="text-4xl font-black mb-2">Smart Care for Your Elders</h2>
+        <p className="text-gray-400 font-medium mb-0">Experience the future of healthcare assistance at your fingertips.</p>
       </motion.div>
     </div>
   );
