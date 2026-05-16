@@ -35,6 +35,9 @@ export default function MedicineReminder() {
   const [activeAlarm, setActiveAlarm] = useState<Medicine | null>(null);
   const [snoozedMeds, setSnoozedMeds] = useState<Record<string, number>>({});
   
+  const [showSnoozeOptions, setShowSnoozeOptions] = useState(false);
+  const [customSnooze, setCustomSnooze] = useState('');
+  
   // Form State
   const [name, setName] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -85,7 +88,17 @@ export default function MedicineReminder() {
 
     recognition.onstart = () => setIsListening(true);
     recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      if (event.error === 'not-allowed') {
+        alert("Microphone access was denied. Please check your browser permissions.");
+      } else if (event.error === 'no-speech') {
+        // Silent error, just stop listening
+      } else {
+        alert(`Voice input error: ${event.error}`);
+      }
+    };
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript.toLowerCase();
@@ -97,42 +110,64 @@ export default function MedicineReminder() {
   };
 
   const parseVoiceInput = (text: string) => {
-    // Basic Parsing Strategy
-    // Expected phrases: "Take [name] at [time] [dosage]" or similar
-    
-    // 1. Time extraction (HH:MM or H:MM)
-    const timeRegex = /(\d{1,2}):(\d{2})(\s+)?(am|pm)?/i;
-    const timeMatch = text.match(timeRegex);
-    if (timeMatch) {
-      let hours = parseInt(timeMatch[1]);
-      const minutes = timeMatch[2];
-      const ampm = timeMatch[4]?.toLowerCase();
-      
-      if (ampm === 'pm' && hours < 12) hours += 12;
-      if (ampm === 'am' && hours === 12) hours = 0;
-      
-      const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes}`;
-      setTime(formattedTime);
+    let currentText = text.toLowerCase();
+
+    // 1. Time extraction
+    const timePatterns = [
+      /(\d{1,2}):(\d{2})\s*(am|pm)/i,
+      /(\d{1,2})\s*(am|pm)/i,
+      /(\d{1,2}):(\d{2})/i,
+      /at\s*(\d{1,2})/i,
+      /(\d{1,2})\s*o'clock/i
+    ];
+
+    let foundTime = '';
+    for (const pattern of timePatterns) {
+      const match = currentText.match(pattern);
+      if (match) {
+        let hours = parseInt(match[1]);
+        let minutes = '00';
+        let ampm = '';
+
+        if (pattern.source.includes(':(\\d{2})')) {
+          minutes = match[2];
+          ampm = match[3] || '';
+        } else {
+          ampm = match[2] || '';
+          if (ampm && ampm.toLowerCase().includes("o'clock")) ampm = '';
+        }
+
+        if (ampm.toLowerCase() === 'pm' && hours < 12) hours += 12;
+        if (ampm.toLowerCase() === 'am' && hours === 12) hours = 0;
+
+        if (hours >= 0 && hours <= 23) {
+          foundTime = `${hours.toString().padStart(2, '0')}:${minutes}`;
+          setTime(foundTime);
+          currentText = currentText.replace(match[0], '');
+          break;
+        }
+      }
     }
 
-    // 2. Dosage extraction (keywords: "tablet", "pill", "ml", "mg", "dose")
-    const dosageRegex = /(\d+(\.\d+)?\s?(tablet|pills|ml|mg|dose|tablespoon|teaspoon)s?)/i;
-    const dosageMatch = text.match(dosageRegex);
+    // 2. Dosage extraction
+    const dosageRegex = /(\d+(\.\d+)?\s*(tablet|pills|ml|mg|dose|tablespoon|teaspoon|pill|gram|mcg)s?)/i;
+    const dosageMatch = currentText.match(dosageRegex);
     if (dosageMatch) {
       setDosage(dosageMatch[1]);
+      currentText = currentText.replace(dosageMatch[0], '');
     }
 
     // 3. Name extraction
-    // Heuristic: Remove the words "take", "at", the time, the dosage, and cleaning up
-    let cleanedName = text
-      .replace(/take/i, '')
-      .replace(/at/i, '')
-      .replace(timeRegex, '')
-      .replace(dosageRegex, '')
+    let cleanedName = currentText
+      .replace(/\btake\b/gi, '')
+      .replace(/\bremind me to\b/gi, '')
+      .replace(/\badd\b/gi, '')
+      .replace(/\bmedicine\b/gi, '')
+      .replace(/\bat\b/gi, '')
+      .replace(/\bby\b/gi, '')
       .replace(/\s+/g, ' ')
       .trim();
 
-    // Capitalize first letter
     if (cleanedName) {
       cleanedName = cleanedName.charAt(0).toUpperCase() + cleanedName.slice(1);
       setName(cleanedName);
@@ -310,6 +345,7 @@ export default function MedicineReminder() {
       return next;
     });
     setActiveAlarm(null);
+    setShowSnoozeOptions(false);
     window.speechSynthesis.cancel();
   };
 
@@ -317,6 +353,7 @@ export default function MedicineReminder() {
     const snoozeTime = Date.now() + minutes * 60 * 1000;
     setSnoozedMeds(prev => ({ ...prev, [id]: snoozeTime }));
     setActiveAlarm(null);
+    setShowSnoozeOptions(false);
     window.speechSynthesis.cancel();
   };
 
@@ -340,6 +377,7 @@ export default function MedicineReminder() {
 
     setSnoozedMeds({}); // Clear all snoozes
     setActiveAlarm(null);
+    setShowSnoozeOptions(false);
     window.speechSynthesis.cancel();
   };
 
@@ -678,13 +716,68 @@ export default function MedicineReminder() {
                   <CheckCircle2 size={24} />
                   DISMISS ALL
                 </button>
-                <button 
-                  onClick={() => snoozeMed(activeAlarm.id, 5)}
-                  className="bg-transparent text-white/60 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:text-white transition-colors flex items-center justify-center gap-2"
-                >
-                  <Clock size={20} />
-                  Remind me in 5 mins
-                </button>
+                {!showSnoozeOptions ? (
+                  <button 
+                    onClick={() => setShowSnoozeOptions(true)}
+                    className="bg-transparent text-white/60 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:text-white transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Clock size={20} />
+                    Snooze Reminder
+                  </button>
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white/10 backdrop-blur-md p-6 rounded-[32px] border border-white/20 space-y-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Snooze Duration</p>
+                      <button onClick={() => setShowSnoozeOptions(false)} className="opacity-40 hover:opacity-100">
+                        <X size={16} />
+                      </button>
+                    </div>
+                    
+                    <div className="flex justify-between gap-2">
+                      {[5, 15, 30].map(mins => (
+                        <button 
+                          key={mins}
+                          onClick={() => snoozeMed(activeAlarm.id, mins)}
+                          className="flex-1 bg-white/20 hover:bg-white/30 py-3 rounded-2xl font-bold transition-all text-sm"
+                        >
+                          {mins}m
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input 
+                          type="number"
+                          placeholder="Minutes"
+                          value={customSnooze}
+                          onChange={(e) => setCustomSnooze(e.target.value)}
+                          className="w-full bg-white/10 border-none rounded-2xl py-3 px-4 text-center text-white placeholder:text-white/30 focus:ring-1 focus:ring-white outline-none text-sm"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              const mins = parseInt(customSnooze);
+                              if (mins > 0) snoozeMed(activeAlarm.id, mins);
+                            }
+                          }}
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          const mins = parseInt(customSnooze);
+                          if (mins > 0) snoozeMed(activeAlarm.id, mins);
+                        }}
+                        disabled={!customSnooze || parseInt(customSnooze) <= 0}
+                        className="bg-white text-[#E29578] px-6 rounded-2xl font-bold text-sm disabled:opacity-50"
+                      >
+                        Snooze
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           </div>

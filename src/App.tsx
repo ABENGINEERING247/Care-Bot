@@ -32,7 +32,7 @@ export default function App() {
           className="whitespace-nowrap inline-block"
         >
           <span className="text-xs font-black uppercase tracking-widest text-[#E29578] mx-4">
-            App is developed by AICIRCLE! • Smart Healthcare Solutions • Innovation in Care • App is developed by AICIRCLE!
+            App is developed by the students of KIET! • Smart Healthcare Solutions • Innovation in Care • App is developed by the students of KIET!
           </span>
         </motion.div>
       </div>
@@ -94,8 +94,8 @@ export default function App() {
          <Entertainment />}
         
         <footer className="mt-12 mb-8 text-center bg-transparent pt-8 opacity-60">
-          <p className="text-xs font-black uppercase tracking-widest text-[#E29578]">Designed by AICIRCLE</p>
-          <p className="text-xs font-bold text-gray-400 mt-1">Founder: Engr. Bilal Mehmood</p>
+          <p className="text-xs font-black uppercase tracking-widest text-[#E29578]">Designed by the students of KIET</p>
+          <p className="text-xs font-bold text-gray-400 mt-1">Mahad Naeem - Usman - Faizan - Wajjie</p>
         </footer>
       </main>
     </div>

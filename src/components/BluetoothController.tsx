@@ -67,8 +67,7 @@ export default function BluetoothController() {
       onClick={() => sendCommand(cmd)}
       className={`relative w-24 h-24 rounded-3xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 shadow-lg ${
         lastCommand === cmd ? 'bg-black text-white' : `${color} text-gray-900`
-      } ${status !== 'connected' ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:bg-gray-50'}`}
-      disabled={status !== 'connected'}
+      } hover:bg-gray-50`}
     >
       <Icon size={32} />
       <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
@@ -110,8 +109,7 @@ export default function BluetoothController() {
           <ControlButton cmd="L" icon={ChevronLeft} color="bg-gray-100" label="Left" />
           <button
             onClick={() => sendCommand('S')}
-            className={`w-24 h-24 bg-rose-500 text-white rounded-full flex flex-col items-center justify-center gap-1 shadow-lg hover:bg-rose-600 transition-all active:scale-90 ${status !== 'connected' ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
-            disabled={status !== 'connected'}
+            className="w-24 h-24 bg-rose-500 text-white rounded-full flex flex-col items-center justify-center gap-1 shadow-lg hover:bg-rose-600 transition-all active:scale-90"
           >
             <Square size={32} fill="currentColor" />
             <span className="text-[10px] font-black uppercase tracking-widest">Stop</span>
@@ -122,27 +120,6 @@ export default function BluetoothController() {
         {/* Bottom Row */}
         <ControlButton cmd="B" icon={ChevronDown} color="bg-gray-100" label="Backward" />
       </div>
-
-      {status !== 'connected' && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-4 bg-[#F9FAFB] border border-dashed border-gray-200 rounded-[32px] p-6 flex flex-col items-center text-center"
-        >
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 mb-4">
-            <Zap size={20} />
-          </div>
-          <h3 className="text-sm font-black text-gray-900 mb-1 uppercase tracking-tight">Robot Not Linked</h3>
-          <p className="text-gray-400 max-w-xs mb-4 text-[11px] font-medium leading-relaxed">Tap "Connect Robot" at the top to start controlling your hardware.</p>
-          
-          <div className="flex items-start gap-2 text-left bg-blue-50 p-3 rounded-xl max-w-sm">
-            <Info className="text-blue-500 shrink-0 mt-0.5" size={14} />
-            <p className="text-[9px] text-blue-800 leading-relaxed">
-              Arduino Serial: Listening for 'F', 'B', 'L', 'R', and 'S'. (9600 baud)
-            </p>
-          </div>
-        </motion.div>
-      )}
 
       {status === 'error' && (
         <div className="mt-6 flex flex-col gap-3">

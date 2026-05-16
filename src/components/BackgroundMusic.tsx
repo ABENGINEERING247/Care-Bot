@@ -12,7 +12,7 @@ declare global {
 export default function BackgroundMusic() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(80);
   const playerRef = useRef<any>(null);
   const apiLoaded = useRef(false);
 
@@ -34,13 +34,28 @@ export default function BackgroundMusic() {
         width: '0',
         videoId: videoId,
         playerVars: {
-          autoplay: 0,
+          autoplay: 1,
           loop: 1,
-          playlist: videoId
+          playlist: videoId,
+          controls: 0,
+          showinfo: 0,
+          rel: 0,
+          enablejsapi: 1,
+          origin: window.location.origin
         },
         events: {
           onReady: (event: any) => {
             event.target.setVolume(volume);
+            // Try to play immediately, might be blocked but worth a try
+            event.target.playVideo();
+          },
+          onStateChange: (event: any) => {
+            // Synchronize state if player changes internally
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              setIsPlaying(true);
+            } else if (event.data === window.YT.PlayerState.PAUSED) {
+              setIsPlaying(false);
+            }
           }
         }
       });
@@ -58,6 +73,29 @@ export default function BackgroundMusic() {
       playerRef.current.setVolume(volume);
     }
   }, [volume]);
+
+  // Media Session API for Mobile Integration
+  useEffect(() => {
+    if ('mediaSession' in navigator && isPlaying) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: 'Hum Kyun Chalen',
+        artist: 'Coke Studio',
+        album: 'CareBot Radio',
+        artwork: [
+          { src: `https://img.youtube.com/vi/${videoId}/0.jpg`, sizes: '480x360', type: 'image/jpeg' },
+        ]
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => {
+        playerRef.current?.playVideo();
+        setIsPlaying(true);
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+        playerRef.current?.pauseVideo();
+        setIsPlaying(false);
+      });
+    }
+  }, [isPlaying]);
 
   const togglePlayback = () => {
     if (playerRef.current) {
@@ -131,19 +169,29 @@ export default function BackgroundMusic() {
 
         <button 
           onClick={() => setIsExpanded(!isExpanded)}
-          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-90 relative ${
-            isPlaying ? 'bg-[#E29578] text-white' : 'bg-white text-gray-400 border border-gray-100 hover:border-gray-200'
+          className={`h-14 rounded-full flex items-center justify-center shadow-xl transition-all active:scale-90 relative px-4 gap-2 ${
+            isPlaying ? 'bg-[#E29578] text-white w-14' : 'bg-white text-gray-400 border border-gray-100 hover:border-gray-200'
           }`}
         >
           {isPlaying && (
             <span className="absolute inset-0 rounded-full bg-[#E29578] animate-ping opacity-20"></span>
           )}
-          {isPlaying ? <Music size={24} className="relative" /> : <Volume2 size={24} />}
+          {isPlaying ? (
+            <Music size={24} className="relative" />
+          ) : (
+            <>
+              <Volume2 size={24} />
+              <span className="text-[10px] font-black uppercase tracking-widest pr-1">Play Radio</span>
+              {!isPlaying && (
+                <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#E29578] rounded-full animate-bounce"></span>
+              )}
+            </>
+          )}
         </button>
       </div>
 
       {/* Hidden YouTube Container */}
-      <div id="yt-player" className="hidden"></div>
+      <div id="yt-player" className="invisible absolute pointer-events-none -z-50"></div>
     </div>
   );
 }
