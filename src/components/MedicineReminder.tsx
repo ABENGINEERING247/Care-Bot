@@ -363,9 +363,15 @@ export default function MedicineReminder() {
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
     setMeds(meds.map(m => {
-      const isDue = (m.days.includes(currentDay) && m.time === currentTime && !m.taken);
-      const isSnoozed = snoozedMeds[m.id] && now.getTime() >= snoozedMeds[m.id];
-      if (isDue || isSnoozed) {
+      // Logic for dismissing:
+      // 1. Medicine is scheduled for right now
+      const isDueNow = (m.days.includes(currentDay) && m.time === currentTime && !m.taken);
+      // 2. Medicine is snoozed and the snooze time has passed or started
+      const isSnoozedDue = snoozedMeds[m.id] && now.getTime() >= snoozedMeds[m.id];
+      // 3. Medicine is currently shown as the active alarm
+      const isCurrentlyAlarming = activeAlarm?.id === m.id;
+
+      if (isDueNow || isSnoozedDue || isCurrentlyAlarming) {
         return { 
           ...m, 
           taken: true,
@@ -375,7 +381,8 @@ export default function MedicineReminder() {
       return m;
     }));
 
-    setSnoozedMeds({}); // Clear all snoozes
+    // Clear all active snoozes when dismissing all
+    setSnoozedMeds({});
     setActiveAlarm(null);
     setShowSnoozeOptions(false);
     window.speechSynthesis.cancel();

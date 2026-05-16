@@ -12,6 +12,7 @@ import BluetoothController from './components/BluetoothController';
 import PharmacyDelivery from './components/PharmacyDelivery';
 import WelcomePage from './components/WelcomePage';
 import BackgroundMusic from './components/BackgroundMusic';
+import FireAlarmIndicator from './components/FireAlarmIndicator';
 import { Pill, Gamepad2, MessageCircle, Zap, ShoppingBag, Home } from 'lucide-react';
 
 export default function App() {
@@ -38,6 +39,7 @@ export default function App() {
       </div>
 
       <BackgroundMusic />
+      <FireAlarmIndicator />
       
       {/* Bottom Navigation for easy access on tablet */}
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/80 backdrop-blur-md border border-gray-100 px-6 py-3 rounded-full shadow-xl flex gap-8 z-[60]">
